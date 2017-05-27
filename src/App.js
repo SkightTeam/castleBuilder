@@ -99,7 +99,7 @@ class App extends Component {
     }
 
     cleanInput(terrainArray) {
-        return filterNumbers(this.trim(terrainArray).split(',')).join(',');
+        return this.trim(terrainArray);
     }
 }
 
