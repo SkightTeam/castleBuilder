@@ -1,6 +1,6 @@
 // test array:
 // const terrain = [1, 3, 2, 2, 2, 2, 6, 7, 3, '', null, 'undefined', false, 6, 1, 1, 1, 8,8, 8,8,8,8, 7, 3, 3, 3, 3, 7, 9,9];
-//const terrain =  [2, 6, 6, 6, 3, 6, 1, 4];
+
 let castles = [];
 
 const _getCastle = (currentNumber, nextNumber, prevNumber, index, lastIndex) => {
