@@ -98,8 +98,7 @@ const _getNonSeriesCastles = array => {
 
 export const filterNumbers = array => array.filter(n => n && typeof Number(n) === 'number');
 
-
-// Main method
+// Main function
 export const buildCastles = terrain => {
     castles = [];
 
