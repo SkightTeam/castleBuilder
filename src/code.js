@@ -6,18 +6,19 @@ let castles = [];
 const _getCastle = (currentNumber, nextNumber, prevNumber, index, lastIndex) => {
     // Beginning of array, ignore previous number value
     if (index === 0) {
-        const sample = `${currentNumber}${nextNumber}`;
+        const sample = `(${currentNumber}${nextNumber})`;
 
         // Valley castle can be built on terrain[1]
         if (currentNumber > nextNumber) castles.push(sample);
 
         // Peak castle can be built on terrain[1]
         if (currentNumber < nextNumber) castles.push(sample);
+      
     }
 
     // End of array, ignore nextNumber number value
     if (index === lastIndex) {
-        const sample = `${prevNumber}${currentNumber}`;
+        const sample = `(${prevNumber}${currentNumber})`;
 
         // Valley castle can be built
         if (prevNumber > currentNumber) castles.push(sample);
@@ -28,7 +29,7 @@ const _getCastle = (currentNumber, nextNumber, prevNumber, index, lastIndex) => 
 
     // Middle of array use previous, current and nextNumber sample values
     if ((prevNumber || prevNumber === 0) && (nextNumber || nextNumber === 0)) {
-        const sample = `${prevNumber}${currentNumber}${nextNumber}`;
+        const sample = `(${prevNumber}${currentNumber}${nextNumber})`;
 
         // Valley castle can be built
         if (prevNumber > currentNumber && nextNumber > currentNumber) castles.push(sample);
@@ -39,16 +40,25 @@ const _getCastle = (currentNumber, nextNumber, prevNumber, index, lastIndex) => 
 };
 
 const _getSeriesCastles = terrain => {
-    // Add all groups that are indentical number series into an array:  [2,2,2,4,4,6,6,6,6,3,3,3] etc..
+
+    /*
+     * Create an array of objects containing all the info we need to check
+     * if a series of identical numbers is a peak or valley
+     *
+     * For example: we have the following in our terrain array [2,4,4,4,1,6,6,6,6,2]
+     * An array containing these objects will be returned:
+     * [
+     *  4: {count: 3,indexSpan: [1,2,3]},
+     *  6: {count: 4, indexSpan: [5,6,7,8]}
+     * ]
+     *
+     */
     const numberIndexMap = terrain.reduce((numberIndexMap, currentNumber, index, array) => {
         if (array[index + 1] === currentNumber || array[index - 1] === currentNumber) {
             numberIndexMap.push({ number: currentNumber, index });
         }
         return numberIndexMap;
-    }, []);
-
-    // Create a map with counts of each group of identical number series
-    const identicalNumbersCountMap = numberIndexMap.reduce((prev, { number, index }, i, array) => {
+    }, []).reduce((prev, { number, index }, i, array) => {
         prev[number] = prev[number] || {};
         prev[number].indexSpan = prev[number].indexSpan || [];
         prev[number].count = prev[number].count || 0;
@@ -69,10 +79,10 @@ const _getSeriesCastles = terrain => {
             }
         }
 
-        castles.push(array.join(''));
+        castles.push(`(${array.join('')})`);
     };
 
-    Object.keys(identicalNumbersCountMap).forEach(number => addCastles(identicalNumbersCountMap[number], number));
+    Object.keys(numberIndexMap).forEach(number => addCastles(numberIndexMap[number], number));
 };
 
 const _getNonSeriesCastles = array => {
@@ -88,6 +98,8 @@ const _getNonSeriesCastles = array => {
 
 export const filterNumbers = array => array.filter(n => n && typeof Number(n) === 'number');
 
+
+// Main method
 export const buildCastles = terrain => {
     castles = [];
 
