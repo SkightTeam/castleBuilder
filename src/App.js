@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { VictoryChart, VictoryLine, VictoryTheme } from 'victory';
 import { buildCastles, filterNumbers } from './code';
 
+import logo from './logo.svg';
 
 class App extends Component {
     constructor() {
@@ -21,23 +22,19 @@ class App extends Component {
         const { castles, data, terrainArray } = this.state;
         const chartData = this._getChartData(data);
 
-        let displayCastles = null;
+        let displayCastles = <h3>Enter comma separated numbers and hit submit</h3>;
         if (castles && castles.length) {
-            displayCastles = <h3>{castles.length + ' castles can be built: ' + castles.join(', ')}</h3>;
-        }
-
-        if (castles && !castles.length) {
-            displayCastles = <h3>0 castles can be built</h3>;
+            displayCastles = <h3>{castles.length + ' castle(s) can be built: ' + castles.join(', ')}</h3>;
         }
 
         return (
             <div className="App">
                 <div className="App-header">
-
+                    <img src={logo} className="App-logo" alt="logo" />
                     <h2>Welcome to Castle Builder</h2>
-                    <h3>Enter comma separated numbers and submit</h3>
                 </div>
                 <p className="App-intro">
+                    {displayCastles}
                     <input
                         className="terrainInput"
                         type="text"
@@ -48,10 +45,10 @@ class App extends Component {
 
                 </p>
                 <button onClick={this._handleButtonClick.bind(this)}>submit values</button>
-                {displayCastles}
+
                 <div className="chartContainer">
                     <VictoryChart
-                        domainPadding={20}
+                        domainPadding={25}
                         scale={{ x: 'linear', y: 'linear' }}
                         theme={VictoryTheme.material}
                         padding={50}
