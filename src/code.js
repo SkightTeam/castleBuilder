@@ -13,6 +13,7 @@ const _getCastle = (currentNumber, nextNumber, prevNumber, index, lastIndex) => 
 
         // Peak castle can be built on terrain[1]
         if (currentNumber < nextNumber) castles.push(sample);
+      
     }
 
     // End of array, ignore nextNumber number value
@@ -39,6 +40,7 @@ const _getCastle = (currentNumber, nextNumber, prevNumber, index, lastIndex) => 
 };
 
 const _getSeriesCastles = terrain => {
+
     /*
      * Create an array of objects containing all the info we need to check
      * if a series of identical numbers is a peak or valley
