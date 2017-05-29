@@ -1,5 +1,5 @@
 // test array:
-// const terrain = [1, 1, 2, 2, 2, 2, 6, 7, 3, '', null, 'undefined', false, 6, 1, 1, 1, 8,8, 8,8,8,8, 7, 3, 3, 3, 3, 7, 9,9];
+// const terrain = [1, 1, 2, 2, 2, 2, 6, 7, 3, '', null, 'undefined', false, 6, 8,8, 8,8,8,8, 7, 3, 3, 3, 3, 7, 9,9];
 
 let castles = [];
 
@@ -52,34 +52,57 @@ const _getSeriesCastles = terrain => {
      *  6: {count: 4, indexSpan: [5,6,7,8]}
      * ]
      *
+     * FIXME: Duplicate series groups at non consecutive indexes get merged!
+     *
      */
-    const numberIndexMap = terrain.reduce((numberIndexMap, currentNumber, index, array) => {
-        if (array[index + 1] === currentNumber || array[index - 1] === currentNumber) {
-            numberIndexMap.push({ number: currentNumber, index });
-        }
-        return numberIndexMap;
-    }, []).reduce((prev, { number, index }, i, array) => {
-        prev[number] = prev[number] || {};
-        prev[number].indexSpan = prev[number].indexSpan || [];
-        prev[number].count = prev[number].count || 0;
-        (prev[number].count = prev[number].count + 1), prev[number].indexSpan.push(index);
-        return prev;
-    }, {});
+    const numberIndexMap = terrain
+        .reduce((numberIndexMap, currentNumber, index, array) => {
+            if (array[index + 1] === currentNumber || array[index - 1] === currentNumber) {
+                numberIndexMap.push({ number: currentNumber, index });
+            }
+            return numberIndexMap;
+        }, [])
+        .reduce((prev, { number, index }) => {
+            prev[number] = prev[number] || {};
+            prev[number].indexSpan = prev[number].indexSpan || [];
+            prev[number].count = prev[number].count || 0;
+            prev[number].count = prev[number].count + 1;
+            prev[number].indexSpan.push(index);
+            return prev;
+        }, {});
 
     // Add the groups of identical numbers to the main castle container for safe keeping
     const addCastles = ({ count, indexSpan }, number) => {
-        const array = [];
+        console.log('count, indexSpan, number', count, indexSpan, number);
 
-        if (
-            (terrain[indexSpan[0] - 1] > number && terrain[indexSpan[indexSpan.length - 1] + 1] > number) ||
-            (terrain[indexSpan[0] - 1] < number && terrain[indexSpan[indexSpan.length - 1] + 1] < number)
-        ) {
+        const array = [];
+        const precedingInt = terrain[indexSpan[0] - 1];
+        const followingInt = terrain[indexSpan[indexSpan.length - 1] + 1];
+        const terrainArrayStart = terrain[0];
+        const terrainArrayEnd = terrain[terrain.length - 1];
+
+        // Check preceeding and following number of identical series groups to determine peak/valley
+        if ((precedingInt > number && followingInt > number) || (precedingInt < number && followingInt < number)) {
             for (let i = 0; i < count; i += 1) {
                 array.push(number);
             }
         }
 
-        castles.push(`(${array.join('')})`);
+        // Handle special case for series groups at start of array
+        if (!precedingInt && terrainArrayStart && (followingInt > number || followingInt < number)) {
+            for (let i = 0; i < count; i += 1) {
+                array.push(number);
+            }
+        }
+
+        // Handle special case for series groups at end of array
+        if (!followingInt && terrainArrayEnd && (precedingInt > number || precedingInt < number)) {
+            for (let i = 0; i < count; i += 1) {
+                array.push(number);
+            }
+        }
+
+        if (array.length) castles.push(`(${array.join('')})`);
     };
 
     Object.keys(numberIndexMap).forEach(number => addCastles(numberIndexMap[number], number));

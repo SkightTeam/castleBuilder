@@ -1,16 +1,16 @@
 import './App.css';
 
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { VictoryChart, VictoryLine, VictoryTheme } from 'victory';
 import { buildCastles, filterNumbers } from './code';
 
 import logo from './logo.svg';
 
-class App extends Component {
+class App extends PureComponent {
     constructor() {
         super();
         this.state = {
-            terrainArray: '',
+            terrainStringFromInput: '',
             data: [],
             castles: null
         };
@@ -19,12 +19,12 @@ class App extends Component {
     render() {
         console.log('state', this.state);
 
-        const { castles, data, terrainArray } = this.state;
+        const { castles, data, terrainStringFromInput } = this.state;
         const chartData = this._getChartData(data);
 
         let displayCastles = <h3>Enter comma separated numbers and hit submit</h3>;
         if (castles && castles.length) {
-            displayCastles = <h3>{castles.length + ' castle(s) can be built: ' + castles.join(', ')}</h3>;
+            displayCastles = <h3>{`${castles.length} castle(s) can be built: ${castles.join(', ')}`}</h3>;
         }
 
         return (
@@ -33,18 +33,18 @@ class App extends Component {
                     <img src={logo} className="App-logo" alt="logo" />
                     <h2>Welcome to Castle Builder</h2>
                 </div>
-                <p className="App-intro">
+                <div className="App-intro">
                     {displayCastles}
                     <input
                         className="terrainInput"
                         type="text"
                         placeholder="2, 2, 2, 1, 4, 0, 5 etc..."
-                        value={this.cleanInput(terrainArray)}
+                        value={this.trim(terrainStringFromInput)}
                         onChange={this._handleNameChange.bind(this)}
                     />
 
-                </p>
-                <button onClick={this._handleButtonClick.bind(this)}>submit values</button>
+                </div>
+                <button onClick={this._handleButtonClick.bind(this)}>submit</button>
 
                 <div className="chartContainer">
                     <VictoryChart
@@ -67,36 +67,35 @@ class App extends Component {
     }
 
     _handleNameChange(event) {
-        this.setState({ terrainArray: event.target.value });
+        this.setState({ terrainStringFromInput: event.target.value });
     }
 
     _handleButtonClick() {
-        const { terrainArray } = this.state;
-        if (!terrainArray) {
+        const { terrainStringFromInput } = this.state;
+        if (!terrainStringFromInput) {
             this.setState({ data: [], castles: null });
             return false;
         }
-        const inputArray = this.trim(terrainArray).split(',');
+        const inputArray = this.trim(terrainStringFromInput).split(',');
         const filteredInputArray = filterNumbers(inputArray);
+
+        // This is where the magic happens with "buildCastles()"
         const castles = buildCastles(inputArray);
         const filteredCastles = filterNumbers(castles);
         this.setState({ data: filteredInputArray, castles: filteredCastles });
     }
 
+    // Format data in the way Victory js wants it
     _getChartData(data) {
-        return data.map((number, index, array) => {
+        return data.map(number => {
             return { num: Number(number) };
         });
     }
 
-    trim(str) {
+    trim(string) {
         // Commas and numbers only
-        str = str.replace(/[^\d,]+/g, '');
-        return str;
-    }
-
-    cleanInput(terrainArray) {
-        return this.trim(terrainArray);
+        string = string.replace(/[^\d,]+/g, '');
+        return string;
     }
 }
 
