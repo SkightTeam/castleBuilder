@@ -1,5 +1,5 @@
 // test array:
-// const terrain = [1, 1, 2, 2, 2, 2, 6, 7, 3, '', null, 'undefined', false, 6, 1, 1, 1, 8,8, 8,8,8,8, 7, 3, 3, 3, 3, 7, 9,9];
+// const terrain = [1, 1, 2, 2, 2, 2, 6, 7, 3, '', null, 'undefined', false, 6, 8,8, 8,8,8,8, 7, 3, 3, 3, 3, 7, 9,9];
 
 let castles = [];
 
